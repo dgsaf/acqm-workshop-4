@@ -22,7 +22,7 @@ program main
     contwaves(:,:),  & !projectile radial continuum waves contwaves(k,r)
     DCS(:),          & !array to hold differential cross section - DCS(theta)
     theta(:),        & !array to hold values of theta - in degrees
-    ICS(:),          & !integrated cross section per l
+    ICS(:)             !integrated cross section per l
 
   real*8 :: &
     rmax,   & !max value of radial grid
@@ -36,14 +36,14 @@ program main
   integer :: &
     nrmax,      & !number of rgrid points
     nkmax,      & !number of kgrid points
-    zproj,      & !projectile charge 
+    zproj,      & !projectile charge
     l,          & !partial-wave angular momentum
     lmin, lmax, & !min and max values of l
     iounit,     & !a unit number for input/ouput
     ntheta,     & !an index to iterate over theta
     nthetamax,  & !max number of theta
     kg_Na, kg_Nb, kg_Np !some more parameters for setting up kgrid
-  
+
   !set kgrid parameters - leave this as is
     kg_Na = 30; kg_Nb = 30; kg_Np = 10
     kg_a = 0.85; kg_b = 2.5; kg_p = 4.0
@@ -60,7 +60,7 @@ program main
 
   !>>> determine number of rgrid points nrmax
   !    note: nrmax should be even for simpson's integration
-  !          to take into account that the r=0 point has been omitted 
+  !          to take into account that the r=0 point has been omitted
 
   !allocate memory
     allocate(rgrid(nrmax),rweights(nrmax))
@@ -73,15 +73,15 @@ program main
   !setup grids
     call setup_rgrid(nrmax, dr, rgrid, rweights)
     call setup_kgrid(k, nkmax, kg_Na, kg_a, kg_Nb, kg_b, kg_Np, kg_p, kgrid, kweights)
-  
+
   !>>> define short-range potential V(r)
 
   !begin loop over angular momenta
   do l=lmin, lmax
     !populate contwaves matrix with a continuum wave for each off-shell k
       call setup_contwaves(nkmax,kgrid,l,nrmax,rgrid,contwaves)
-    
-    !evaluate the V-matrix elements  
+
+    !evaluate the V-matrix elements
       call calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
 
     !solve the Lippman-Schwinger equation for the on-shell T-matrix
@@ -149,7 +149,7 @@ subroutine setup_rgrid(nrmax, dr, rgrid, rweights)
   !>>> iterate over r and populate the rgrid and rweights arrays
   !      - rweights should contain Simpson's integration weights:
   !        (4, 2, 4, 2, ..., 2, 4) * dr / 3.0
-  !      - you can make use of the intrinsic MOD function for the 
+  !      - you can make use of the intrinsic MOD function for the
   !        alternating 4, 2 terms
   !      - note we have neglected the terms with a coefficient of 1 (rather than 4 or 2) since
   !        the first term (r=0) is skipped and the last term corresponds to the end of the
@@ -165,12 +165,12 @@ subroutine setup_contwaves(nkmax, kgrid, l, nrmax, rgrid, contwaves)
   real*8 :: ncontwaves(nkmax,nrmax)
   integer :: nk, nr !indices to loop over k and r
   real*8 :: E
-  
-  !>>> iterate over k, populating the contwaves matrix                                 
+
+  !>>> iterate over k, populating the contwaves matrix
 
 end subroutine setup_contwaves
 
-   
+
 !>>> your forwards Numerov subroutine can go here
 
 
@@ -185,11 +185,11 @@ subroutine calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
   integer :: nkf,nki !indices for looping over on- and off-shell k
 
   !>>> evaluate the V-matrix elements and store in the Vmat matrix
-  !    note: the V-matrix is symmetric, make use of this fact to reduce the 
+  !    note: the V-matrix is symmetric, make use of this fact to reduce the
   !          amount of time spent in this subroutine
 
 end subroutine calculate_Vmatrix
-    
+
 subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
   use constants
   implicit none
@@ -206,9 +206,9 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
   !>>> store the on-shell V-matrix element in Von
 
   !>>> populate the matrix A according to Eq (113) in the slides
-  
-  !>>> populate the vector Koff with the half-on-shell V-matrix elements (RHS of Eq (112)) 
- 
+
+  !>>> populate the vector Koff with the half-on-shell V-matrix elements (RHS of Eq (112))
+
   !Here is the call to DGESV
   call dgesv( nkmax-1, 1, A, nkmax-1, ipiv, Koff, nkmax-1, info )
   if(info /= 0) then
@@ -216,7 +216,7 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
   endif
 
   !>>> Now use the half-on-shell K matrix which has been stored in Koff to get the on-shell K-matrix element Kon
- 
+
   !>>> And then use Kon to get the on-shell T-matrix element Ton
 
 end subroutine tmatrix_solver
@@ -236,7 +236,7 @@ subroutine setup_kgrid(k,nkmax,Na,a,Nb,b,Np,p,kgrid,kweights)
   real*8 :: grid1(nkmax-1), weight1(nkmax-1)
 
   call kgrid_igor(0.0,k,a,Na,b,Nb,p,Np,nkmax-1,grid1,weight1)
-  
+
   kgrid(1) = k
   kgrid(2:nkmax) = grid1
   kweights(1) = 0.0d0

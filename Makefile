@@ -56,8 +56,9 @@ INTELFORT = ifort
 GCCCFLAGS = -std=c11
 
 # fortran compilation flags
-GCCFFLAGS = -cpp  -dM -ffixed-line-length-none \
-	-Wall -Wextra -Wconversion -pedantic -fcheck=all -fimplicit-none
+# GCCFFLAGS = -cpp  -dM -ffixed-line-length-none \
+# 	-Wall -Wextra -Wconversion -pedantic -fcheck=all -fimplicit-none
+GCCFFLAGS = -cpp  -dM -ffixed-line-length-none
 INTELFFLAGS = -cpp -extend-source -D_INTELFTN
 
 # define cuda compilers
@@ -178,6 +179,7 @@ BSNS_NO_BINS := $(filter-out $(BSNS_BINS),$(BSNS))
 # binary base-names are not included in list of module files
 OBJS := $(addprefix obj/,$(addsuffix .o,$(BSNS)))
 MODS := $(addprefix mod/,$(addsuffix .mod,$(BSNS_NO_BINS)))
+OBJS_NO_BINS := $(addprefix obj/,$(addsuffix .o,$(BSNS_NO_BINS)))
 
 # define binary targets to be made
 BINS := $(addprefix bin/,$(BSNS_BINS))
@@ -227,13 +229,13 @@ clean_bin :
 .SECONDEXPANSION:
 
 # specify explicit target dependencies for objects
-obj/main.o : obj/constants.o $(OBJS)
+obj/main.o : $(OBJS_NO_BINS)
 
 # implicit rule for fixed-fortan targets
 # flags not used to sidestep numerous compilation warnings/errors
 obj/%.o : src/%.f
 	@echo "$(PFX)[FOR $(suffix $<)] $@ : $^"
-	$(FORT) $(COMMONFLAGS)  -c $< -o $@ -J mod/
+	$(FORT) $(COMMONFLAGS) -c $< -o $@ -J mod/
 
 # implicit rule for arbitrary fortan targets
 obj/%.o : $$(firstword $$(filter $$(addprefix src/%,$$(EXTS)),$$(SRCS)))
@@ -241,7 +243,7 @@ obj/%.o : $$(firstword $$(filter $$(addprefix src/%,$$(EXTS)),$$(SRCS)))
 	$(FORT) $(COMMONFLAGS) $(FFLAGS) -c $< -o $@ -J mod/
 
 # # specify explicit target dependencies for binaries
-bin/main.o : $(OBJS)
+bin/main : $(OBJS_NO_BINS)
 
 # implicit rule for binary targets
 bin/% : obj/%.o
