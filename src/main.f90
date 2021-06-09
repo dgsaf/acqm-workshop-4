@@ -70,8 +70,18 @@ program main
 
   !! read energy
   read(iounit, *) energy
-  read(iounit, *) nrmax, dr
+  read(iounit, *) rmax, dr
   read(iounit, *) zproj, lmin, lmax
+
+  ! debug
+  write (*, *) "[debug] read"
+  write (*, *) "[debug] <energy> = ", energy
+  write (*, *) "[debug] <rmax> = ", rmax
+  write (*, *) "[debug] <dr> = ", dr
+  write (*, *) "[debug] <zproj> = ", zproj
+  write (*, *) "[debug] <lmin> = ", lmin
+  write (*, *) "[debug] <lmax> = ", lmax
+  write (*, *) "[debug] end read"
 
   !! close input file
   close(iounit)
@@ -81,7 +91,7 @@ program main
   status = 0
 
   if (energy < 0d0) status = 1
-  if (nrmax < 1) status = 1
+  if (rmax < 0d0) status = 1
   if (dr < 0d0) status = 1
   if (lmin < 0) status = 1
   if (lmax < 0) status = 1
@@ -129,10 +139,28 @@ program main
     V(i_r) = zproj*(1d0 + (1d0/rgrid(i_r)))*exp(-2d0*rgrid(i_r))
   end do
 
+  !! debug: V(:)
+  filename="data/output/potential.txt"
+  open(unit=iounit, file=trim(adjustl(filename)), action="write", &
+      iostat=status)
+  do i_r = 1, nrmax, (nrmax/1000)
+    write (iounit, *) rgrid(i_r), V(i_r)
+  end do
+  close (iounit)
+
   !begin loop over angular momenta
   do l=lmin, lmax
     !populate contwaves matrix with a continuum wave for each off-shell k
     call setup_contwaves(nkmax,kgrid,l,nrmax,rgrid,contwaves)
+
+    !! debug: contwaves(:, :)
+    filename="data/output/contwaves.txt"
+    open(unit=iounit, file=trim(adjustl(filename)), action="write", &
+        iostat=status)
+    do i_r = 1, nrmax, (nrmax/1000)
+      write (iounit, *) rgrid(i_r), contwaves(1:min(nkmax,100), i_r)
+    end do
+    close (iounit)
 
     !evaluate the V-matrix elements
     call calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
@@ -234,7 +262,7 @@ subroutine compute_dcs(nthetamax, theta, lmin, lmax, Ton, k, DCS)
 !>>>    by iterating over l and using the partial-wave
 !>>>    expansion of f
   do ntheta = 1, nthetamax
-    costheta = cos(theta * (pi/180d0))
+    costheta = cos(theta(ntheta) * (pi/180d0))
 
     f(ntheta) = 0d0
     do l = lmin, lmax
@@ -275,11 +303,6 @@ subroutine setup_rgrid(nrmax, dr, rgrid, rweights)
   !! calculate simpson's integration weights
   rweights(1:nrmax:2) = 4d0
   rweights(2:nrmax:2) = 2d0
-  !! debug
-  write (*, *) "[debug] <rweights>"
-  do ir = 1, nrmax
-    write (*, *) ii, rweights(ii)
-  end do
   !! scale weights appropriately
   rweights(:) = rweights(:) * (dr/3d0)
 
@@ -295,11 +318,15 @@ subroutine setup_contwaves(nkmax, kgrid, l, nrmax, rgrid, contwaves)
   real*8 :: E
   !! numerov variables
   real*8 :: s_grid(nrmax), g_grid(nrmax), v_grid(nrmax)
+  real*8 :: step_size
   integer :: fact_term
   integer :: status
   integer :: ii
 
 !>>> iterate over k, populating the contwaves matrix
+  !! set step_size
+  step_size = rgrid(2) - rgrid(1)
+
   !! initialise numerov grids
   s_grid(:) = 0d0
   v_grid(:) = ((l)*(l + 1d0))/(rgrid(:) ** 2)
@@ -322,12 +349,13 @@ subroutine setup_contwaves(nkmax, kgrid, l, nrmax, rgrid, contwaves)
     contwaves(nk, 1:2) = ((rgrid(1:2)*kgrid(nk)) ** (l + 1))/dble(fact_term)
 
     !! perform numerov method
-    call numerov_f(nrmax, rgrid(2)-rgrid(1), s_grid, g_grid, &
+    status = 0
+    call numerov_f(nrmax, step_size, s_grid, g_grid, &
         contwaves(nk, :), status)
 
     !! handle numerov_f failing
     if (status /= 0) then
-      write (*, *) "[error] numerov_f failed"
+      write (*, *) "[error] numerov_f failed with <status> = ", status
       call exit(status)
     end if
   end do
@@ -443,11 +471,11 @@ subroutine calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
   !! loop in efficient order which utilises symmetry of V-matrix
   do nki = 1, nkmax
     !! moved parts of the integrand common to all kf outside for cacheing
-    cache(:) = V(:) * contwaves(kgrid(nki), :) * rweights(:)
+    cache(:) = V(:) * contwaves(nki, :) * rweights(:)
 
     do nkf = 1, nki
       !! calculate V_{f, i} by integration
-      Vmat(nkf, nki) = sum(contwaves(kgrid(nkf), :) * cache(:))
+      Vmat(nkf, nki) = sum(contwaves(nkf, :) * cache(:))
 
       !! set V_{i, f} = V_{f, i} as consequence of symmetric V-matrix
       !! no check for diagonal since setting diagonal to itself is
@@ -457,7 +485,7 @@ subroutine calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
   end do
 
   !! scale V-matrix
-  V(:, :) = V(:, :)  * (2d0/pi)
+  Vmat(:, :) = Vmat(:, :)  * (2d0/pi)
 
 end subroutine calculate_Vmatrix
 
