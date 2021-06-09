@@ -21,8 +21,7 @@ cons_input () {
 store_output () {
   local output="data/output"
 
-  local str=$(printf "z-%+i.l-%i.e-%.1f" $1 $2 $3)
-  echo "${str}"
+  local str=$(printf "z-%+i.l-%i.en-%.1f" $1 $2 $3)
 
   mv "${output}/ics.txt" "${output}/ics.${str}.txt"
   mv "${output}/dcs.txt" "${output}/dcs.${str}.txt"
@@ -66,7 +65,8 @@ echo "> lmax_set: ${lmax_set}"
 echo "> energy_set: ${energy_set}"
 
 # energy jobs (for electron, and positron)
-echo "energy jobs"
+echo ""
+echo "energy jobs:"
 
 # set lmax to highest
 lmax=$(echo "${lmax_set}" | awk '{print $NF}')
@@ -75,7 +75,8 @@ for zproj in ${zproj_set} ; do
   for energy in ${energy_set} ; do
 
     # announce job parameters
-    echo "zproj = ${zproj} , energy = ${energy}"
+    echo ""
+    echo "> lmax = ${lmax} , zproj = ${zproj} , energy = ${energy}"
 
     # construct input file
     cons_input ${zproj} ${lmax} ${energy}
@@ -84,7 +85,7 @@ for zproj in ${zproj_set} ; do
     t_start=$(date +%s)
     bin/main > /dev/null
     t_end=$(date +%s)
-    printf "time = %is\n" $((t_end - t_start))
+    printf "> %is elapsed\n" $((t_end - t_start))
 
     # relocate ics, dcs output files
     store_output ${zproj} ${lmax} ${energy}
@@ -92,26 +93,31 @@ for zproj in ${zproj_set} ; do
   done
 done
 
-# # lmax job (for electron)
-# echo "lmax jobs"
+# lmax job (for electron)
+echo ""
+echo "lmax jobs:"
 
-# # set zproj to -1
-# zproj="-1"
+# set zproj to -1
+zproj="-1"
 
-# # set energy to 25.0 eV
-# energy="25.0"
+# set energy to 25.0 eV
+energy="25.0"
 
-# for lmax in ${lmax_set} ; do
+for lmax in ${lmax_set} ; do
 
-#   # announce job
-#   echo "lmax = ${lmax} "
+  # announce job
+  echo ""
+  echo "zproj = ${zproj} , energy = ${energy} , lmax = ${lmax} "
 
-#   # construct input file
-#   cons_input ${zproj} ${lmax} ${energy}
+  # construct input file
+  cons_input ${zproj} ${lmax} ${energy}
 
-#   # execute job
-#   bin/main > /dev/null
+  # execute job
+  t_start=$(date +%s)
+  bin/main > /dev/null
+  t_end=$(date +%s)
+  printf "> %is elapsed\n" $((t_end - t_start))
 
-#   # relocate ics, dcs output files
-#   store_output ${zproj} ${lmax} ${energy}
-# done
+  # relocate ics, dcs output files
+  store_output ${zproj} ${lmax} ${energy}
+done
