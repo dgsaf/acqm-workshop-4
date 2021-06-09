@@ -57,7 +57,7 @@ GCCCFLAGS = -std=c11
 
 # fortran compilation flags
 GCCFFLAGS = -cpp  -dM -ffixed-line-length-none \
-	-Wall -Wextra -Wconversion -pedantic -fimplicit-none -fcheck=all
+	-Wall -Wextra -Wconversion -pedantic -fcheck=all -fimplicit-none
 INTELFFLAGS = -cpp -extend-source -D_INTELFTN
 
 # define cuda compilers
@@ -155,6 +155,9 @@ PFX := $(NULL)> $(NULL)
 
 # file expansions and related variables
 
+# specify base-names of binary targets to be made
+BSNS_BINS := main
+
 # define source files
 SRCS_C := $(wildcard src/*.c)
 SRCS_H := $(wildcard src/*.h)
@@ -162,20 +165,28 @@ SRCS_CXX := $(wildcard src/*.cpp)
 SRCS_HXX := $(wildcard src/*.hpp)
 SRCS_F := $(wildcard src/*.f*) $(wildcard src/*.F*)
 
-# select fortran files (and c header files for preprocessing)
-HDRS := $(SRCS_H)
+# select fortran files
+HDRS :=
 SRCS := $(SRCS_F)
 
 # define the base-names and file-suffixes of the source files
 EXTS := $(suffix $(SRCS))
 BSNS := $(notdir $(basename $(SRCS)))
+BSNS_NO_BINS := $(filter-out $(BSNS_BINS),$(BSNS))
 
 # define the object and module files for each source file
+# binary base-names are not included in list of module files
 OBJS := $(addprefix obj/,$(addsuffix .o,$(BSNS)))
-MODS := $(addprefix mod/,$(addsuffix .mod,$(BSNS)))
+MODS := $(addprefix mod/,$(addsuffix .mod,$(BSNS_NO_BINS)))
 
 # define binary targets to be made
-BINS :=
+BINS := $(addprefix bin/,$(BSNS_BINS))
+
+# alternative: specify SRCS, OBJS, MODS, BINS basenames here
+# SRCS :=
+# OBJS :=
+# MODS :=
+# BINS :=
 
 
 # directory commands
@@ -212,19 +223,29 @@ clean_bin :
 
 # make commands
 
-# explicit target dependencies for objects
+# use second expansion for implicit targets
+.SECONDEXPANSION:
+
+# specify explicit target dependencies for objects
+obj/main.o : obj/constants.o $(OBJS)
+
+# implicit rule for fixed-fortan targets
+# flags not used to sidestep numerous compilation warnings/errors
+obj/%.o : src/%.f
+	@echo "$(PFX)[FOR $(suffix $<)] $@ : $^"
+	$(FORT) $(COMMONFLAGS)  -c $< -o $@ -J mod/
 
 # implicit rule for arbitrary fortan targets
-obj/%.o : $(firstword $(addprefix src/%,$(EXTS)))
-	@echo "$(PFX)$@ : $^"
+obj/%.o : $$(firstword $$(filter $$(addprefix src/%,$$(EXTS)),$$(SRCS)))
+	@echo "$(PFX)[FOR $(suffix $<)] $@ : $^"
 	$(FORT) $(COMMONFLAGS) $(FFLAGS) -c $< -o $@ -J mod/
 
-
-# explicit target dependencies for binaries
+# # specify explicit target dependencies for binaries
+bin/main.o : $(OBJS)
 
 # implicit rule for binary targets
-bin/% : $(firstword $(addprefix src/%,$(EXTS)))
-	@echo "$(PFX)$@ : $^"
+bin/% : obj/%.o
+	@echo "$(PFX)[BIN] $@ : $^"
 	$(FORT) $(COMMONFLAGS) $(FFLAGS) -o $@ $^ -J mod/
 
 
