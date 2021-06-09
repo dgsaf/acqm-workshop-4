@@ -120,7 +120,8 @@ program main
 
   !setup grids
   call setup_rgrid(nrmax, dr, rgrid, rweights)
-  call setup_kgrid(k, nkmax, kg_Na, kg_a, kg_Nb, kg_b, kg_Np, kg_p, kgrid, kweights)
+  call setup_kgrid(k, nkmax, kg_Na, kg_a, kg_Nb, kg_b, kg_Np, kg_p, kgrid, &
+      kweights)
 
 !>>> define short-range potential V(r)
   !! v(r) = z*(1 + (1/r))*exp(-2r)
@@ -152,9 +153,9 @@ program main
   call compute_ics(lmin, lmax, Ton, k, ICS)
 
 !>>> output the DCS and ICS to files
-!>>>    to easily study the convergence you can write the ics to file as a function of l
-!>>>    along with a running total so that the running total in the final line is your
-!>>>    total ICS summed over l
+!>>>    to easily study the convergence you can write the ics to file as a
+!>>>    function of l along with a running total so that the running total in
+!>>>    the final line is your total ICS summed over l
   !! open dcs output file for writing
   filename="data/output/dcs.txt"
   open(unit=iounit, file=trim(adjustl(filename)), action="write", &
@@ -429,13 +430,34 @@ subroutine calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
   use constants
   implicit none
   integer, intent(in) :: nkmax, nrmax
-  real*8, intent(in) :: kgrid(nkmax), contwaves(nkmax,nrmax), rgrid(nrmax), rweights(nrmax), V(nrmax)
+  real*8, intent(in) :: kgrid(nkmax), contwaves(nkmax,nrmax), rgrid(nrmax), &
+      rweights(nrmax), V(nrmax)
   real*8, intent(out) :: Vmat(nkmax,nkmax)
   integer :: nkf,nki !indices for looping over on- and off-shell k
+  !! array intended to utilise cacheing
+  real*8 :: cache(nrmax)
 
 !>>> evaluate the V-matrix elements and store in the Vmat matrix
-  !    note: the V-matrix is symmetric, make use of this fact to reduce the
-  !          amount of time spent in this subroutine
+!>>>    note: the V-matrix is symmetric, make use of this fact to reduce the
+!>>>          amount of time spent in this subroutine
+  !! loop in efficient order which utilises symmetry of V-matrix
+  do nki = 1, nkmax
+    !! moved parts of the integrand common to all kf outside for cacheing
+    cache(:) = V(:) * contwaves(kgrid(nki), :) * rweights(:)
+
+    do nkf = 1, nki
+      !! calculate V_{f, i} by integration
+      Vmat(nkf, nki) = sum(contwaves(kgrid(nkf), :) * cache(:))
+
+      !! set V_{i, f} = V_{f, i} as consequence of symmetric V-matrix
+      !! no check for diagonal since setting diagonal to itself is
+      !! inconsequential
+      Vmat(nki, nkf) = Vmat(nkf, nki)
+    end do
+  end do
+
+  !! scale V-matrix
+  V(:, :) = V(:, :)  * (2d0/pi)
 
 end subroutine calculate_Vmatrix
 
@@ -456,7 +478,8 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
 
 !>>> populate the matrix A according to Eq (113) in the slides
 
-!>>> populate the vector Koff with the half-on-shell V-matrix elements (RHS of Eq (112))
+!>>> populate the vector Koff with the half-on-shell V-matrix elements (RHS of
+!>>> Eq (112))
 
   !Here is the call to DGESV
   call dgesv( nkmax-1, 1, A, nkmax-1, ipiv, Koff, nkmax-1, info )
@@ -464,7 +487,8 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
     print*, 'ERROR in dgesv: info = ', info
   endif
 
-!>>> Now use the half-on-shell K matrix which has been stored in Koff to get the on-shell K-matrix element Kon
+!>>> Now use the half-on-shell K matrix which has been stored in Koff to get the
+!>>> on-shell K-matrix element Kon
 
 !>>> And then use Kon to get the on-shell T-matrix element Ton
 
