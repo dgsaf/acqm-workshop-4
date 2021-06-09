@@ -232,8 +232,21 @@ subroutine compute_dcs(nthetamax, theta, lmin, lmax, Ton, k, DCS)
 !>>> calculate the scattering amplitude f(theta) for each theta
 !>>>    by iterating over l and using the partial-wave
 !>>>    expansion of f
+  do ntheta = 1, nthetamax
+    costheta = cos(theta * (pi/180d0))
+
+    f(ntheta) = 0d0
+    do l = lmin, lmax
+      f(ntheta) = f(ntheta) + ((2d0*l + 1d0)*Ton(l)*PL(l, costheta))
+    end do
+    f(ntheta) = f(ntheta) * (-pi/(k ** 2))
+
+  end do
 
 !>>> obtain the DCS from the scattering amplitude
+  do ntheta = 1, nthetamax
+    dcs(ntheta) = (abs(f(ntheta))) ** 2
+  end do
 
 end subroutine compute_dcs
 
@@ -253,6 +266,20 @@ subroutine setup_rgrid(nrmax, dr, rgrid, rweights)
 !>>>        than 4 or 2) since the first term (r=0) is skipped and the last term
 !>>>        corresponds to the end of the radial grid where we assume all
 !>>>        functions should be zero (and if not the grid is not large enough)
+  !! calculate radial grid
+  do ir = 1, nrmax
+    rgrid(ir) = dr * ir
+  end do
+
+  !! calculate simpson's integration weights
+  rweights(1:nrmax:2) = 4d0
+  rweights(2:nrmax:2) = 2d0
+  !! debug
+  do ir = 1, nrmax
+    write (*, *) ii, rweights(ii)
+  end do
+  !! scale weights appropriately
+  rweights(:) = rweights(:) * (dr/3d0)
 
 end subroutine setup_rgrid
 
