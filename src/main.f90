@@ -207,6 +207,14 @@ subroutine compute_ics(lmin, lmax, Ton, k, ICS)
   integer :: l
 
 !>>> populate the ICS array with the partial-wave ICS per l
+  !! calculate ics unscaled
+  do l = lmin, lmax
+    ics(l) = (2d0*l + 1d0)*((abs(Ton(l))) ** 2)
+  end do
+
+  !! scale by constant term
+  ics(:) = ics(:) * ((4d0*(pi ** 3))/(k ** 4))
+
 end subroutine compute_ics
 
 subroutine compute_dcs(nthetamax, theta, lmin, lmax, Ton, k, DCS)
