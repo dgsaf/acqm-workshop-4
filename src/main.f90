@@ -275,6 +275,7 @@ subroutine setup_rgrid(nrmax, dr, rgrid, rweights)
   rweights(1:nrmax:2) = 4d0
   rweights(2:nrmax:2) = 2d0
   !! debug
+  write (*, *) "[debug] <rweights>"
   do ir = 1, nrmax
     write (*, *) ii, rweights(ii)
   end do
@@ -291,16 +292,138 @@ subroutine setup_contwaves(nkmax, kgrid, l, nrmax, rgrid, contwaves)
   real*8 :: ncontwaves(nkmax,nrmax)
   integer :: nk, nr !indices to loop over k and r
   real*8 :: E
+  !! numerov variables
+  real*8 :: s_grid(nrmax), g_grid(nrmax), v_grid(nrmax)
+  integer :: fact_term
+  integer :: status
+  integer :: ii
 
 !>>> iterate over k, populating the contwaves matrix
+  !! initialise numerov grids
+  s_grid(:) = 0d0
+  v_grid(:) = ((l)*(l + 1d0))/(rgrid(:) ** 2)
+
+  !! calculate double factorial term
+  fact_term = 1
+  do ii = 1, (2*l + 1), 2
+    fact_term = fact_term * ii
+
+    !! debug
+    write (*, *) "[debug] <ii> = ", ii, "<fact_term> = ", fact_term
+  end do
+
+  !! iterate over k
+  do nk = 1, nkmax
+    !! todo: should inline this
+    g_grid(:) = (kgrid(nk) ** 2) - v_grid(:)
+
+    !! calculate boundary conditions
+    contwaves(nk, 1:2) = ((rgrid(1:2)*kgrid(nk)) ** (l + 1))/dble(fact_term)
+
+    !! perform numerov method
+    call numerov_f(nrmax, rgrid(2)-rgrid(1), s_grid, g_grid, &
+        contwaves(nk, :), status)
+
+    !! handle numerov_f failing
+    if (status /= 0) then
+      write (*, *) "[error] numerov_f failed"
+      call exit(status)
+    end if
+  end do
 
 end subroutine setup_contwaves
 
 
 !>>> your forwards Numerov subroutine can go here
+!! numerov_f
+!!
+!! Brief:
+!! Calculates the values of $y(x)$, defined by the differential equation
+!! $$ y''(x) = -g(x)y(x) + s(x) $$ ,
+!! on a grid to fourth-order accuracy using the forward Numerov method.
+!!
+!! Summary:
+!! Suppose, $X = \{x_{1}, \dotsc, x_{n_{x}}\}$, is a grid with $n_{x}$ points,
+!! such that $x_{i+1} - x_{i} = h$ for all $i = 1, \dotsc, n_{x}-1$,
+!! and that $g(x), s(x) : \mathbb{R} \to \mathbb{R}$ have been evaluated on
+!! this grid.
+!! Suppose further that $y : \mathbb{R} \to \mathbb{R}$ is defined by the
+!! differential equation,
+!! $$ y''(x) = -g(x)y(x) + s(x) $$ ,
+!! and the values of $y(x_{1}), y(x_{2})$ are known.
+!! The values of $y(x_{i})$ for $i = 3, \dotsc, n_{x}$ are calculated to
+!! fourth-order accuracy using the forward Numerov method.
+!!
+!! Input:
+!! - `n_x` is the number of grid points.
+!! - `step_size` is the distance between consecutive points on the grid $X$.
+!! - `s_grid` is the evaluation of $s(x)$ on the grid $X$.
+!! - `g_grid` is the evaluation of $g(x)$ on the grid $X$.
+!!
+!! Output:
+!! - `y_grid` is the evaluation of $y(x)$ on the grid $X$, calculated via the
+!!   forward Numerov method.
+!! - `status` integer status code which takes the following values:
+!!   - `status == 0` indicates successful execution;
+!!   - `status > 0` indicates that the arguments were invalid;
+!!   - `status == -1` indicates that a numerical error (NaN or infinity)
+!!     occured during execution.
+subroutine numerov_f (n_x, step_size, s_grid, g_grid, y_grid, status)
+  integer , intent(in) :: n_x
+  double precision , intent(in) :: step_size
+  double precision , intent(in) :: s_grid(n_x)
+  double precision , intent(in) :: g_grid(n_x)
+  double precision , intent(out) :: y_grid(n_x)
+  integer , intent(out) :: status
+  double precision :: step_s_grid(n_x)
+  double precision :: step_g_grid(n_x)
+  integer :: ii
 
+  ! check if arguments are valid
+  status = 0
 
+  if (n_x < 1) then
+    ! no grid points
+    status = 1
+  end if
 
+  if (step_size < 0d0) then
+    ! non-positive step_size
+    status = 2
+  end if
+
+  ! terminate subroutine if arguments are invalid, otherwise proceed
+  if (status /= 0) then
+    y_grid(:) = 0d0
+    return
+  end if
+
+  ! perform forward-numerov method
+  step_s_grid(:) = s_grid(:) * (step_size ** 2) / 12d0
+  step_g_grid(:) = g_grid(:) * (step_size ** 2) / 12d0
+
+  if (n_x >= 3) then
+    do ii = 2, n_x - 1
+      y_grid(ii+1) = &
+          ((2*y_grid(ii)*(1d0 - 5d0*step_g_grid(ii))) &
+          - (y_grid(ii-1)*(1d0 + step_g_grid(ii-1))) &
+          + (step_s_grid(ii+1) + 10d0*step_s_grid(ii) + step_s_grid(ii-1)) &
+          ) / (1d0 + step_g_grid(ii+1))
+
+      ! check for and handle numerical error (NaN or Infinity) and terminates
+      if ((y_grid(ii+1) /= y_grid(ii+1)) .or. (y_grid(ii+1) > huge(0d0))) then
+        status = -1
+
+        if (ii + 2 <= n_x) then
+          y_grid(ii+2:n_x) = 0d0
+        end if
+
+        return
+      end if
+    end do
+  end if
+
+end subroutine numerov_f
 
 subroutine calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
   use constants
