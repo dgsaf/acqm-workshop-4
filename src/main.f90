@@ -48,6 +48,7 @@ program main
   character(len=200) :: filename !! for file io
   integer :: status !! for error checking
   integer :: i_r, i_k !! for iterating through r, k grids
+  integer :: ii, jj !! for iterating through V matrix
 
   !set kgrid parameters - leave this as is
   kg_Na = 30; kg_Nb = 30; kg_Np = 10
@@ -139,31 +140,48 @@ program main
     V(i_r) = zproj*(1d0 + (1d0/rgrid(i_r)))*exp(-2d0*rgrid(i_r))
   end do
 
-  !! debug: V(:)
-  filename="data/output/potential.txt"
-  open(unit=iounit, file=trim(adjustl(filename)), action="write", &
-      iostat=status)
-  do i_r = 1, nrmax, (nrmax/1000)
-    write (iounit, *) rgrid(i_r), V(i_r)
-  end do
-  close (iounit)
+  ! !! debug: V(:)
+  ! filename="data/output/potential.txt"
+  ! open(unit=iounit, file=trim(adjustl(filename)), action="write", &
+  !     iostat=status)
+  ! do i_r = 1, nrmax, (nrmax/1000)
+  !   write (iounit, *) rgrid(i_r), V(i_r)
+  ! end do
+  ! close (iounit)
+  ! !! debug: end
 
   !begin loop over angular momenta
   do l=lmin, lmax
     !populate contwaves matrix with a continuum wave for each off-shell k
     call setup_contwaves(nkmax,kgrid,l,nrmax,rgrid,contwaves)
 
-    !! debug: contwaves(:, :)
-    filename="data/output/contwaves.txt"
-    open(unit=iounit, file=trim(adjustl(filename)), action="write", &
-        iostat=status)
-    do i_r = 1, nrmax, (nrmax/1000)
-      write (iounit, *) rgrid(i_r), contwaves(1:min(nkmax,100), i_r)
-    end do
-    close (iounit)
+    ! !! debug: contwaves(:, :)
+    ! if (l == 0) then
+    !   filename="data/output/contwaves.txt"
+    !   open(unit=iounit, file=trim(adjustl(filename)), action="write", &
+    !       iostat=status)
+    !   do i_r = 1, nrmax, (nrmax/1000)
+    !     write (iounit, *) rgrid(i_r), contwaves(1:min(nkmax,100), i_r)
+    !   end do
+    !   close (iounit)
+    ! end if
+    ! !! debug: end
 
     !evaluate the V-matrix elements
     call calculate_Vmatrix(nkmax,kgrid,contwaves,nrmax,rgrid,rweights,V,Vmat)
+
+    ! !! debug: V-matrix half-on-shell
+    ! if (l == 0) then
+    !   write (*, *) "[debug] V-matrix half-on-shell"
+    !   filename="data/output/v-matrix-halfonshell.txt"
+    !   open(unit=iounit, file=trim(adjustl(filename)), action="write", &
+    !       iostat=status)
+    !   do ii = 2, nkmax
+    !     write (iounit, *) kgrid(ii), Vmat(ii, 1)
+    !   end do
+    !   close (iounit)
+    ! end if
+    ! !! debug: end
 
     !solve the Lippman-Schwinger equation for the on-shell T-matrix
     call tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton(l))
@@ -218,7 +236,7 @@ program main
   !! write ics to file
   write (iounit, *) "# l, ics(l), sum(ics(1:l))"
   do l = lmin, lmax
-    write (iounit, *) l, ics(l), sum(ics(1:l))
+    write (iounit, *) l, ics(l), sum(ics(lmin:l))
   end do
 
   !! close ics output file
@@ -261,16 +279,18 @@ subroutine compute_dcs(nthetamax, theta, lmin, lmax, Ton, k, DCS)
 !>>> calculate the scattering amplitude f(theta) for each theta
 !>>>    by iterating over l and using the partial-wave
 !>>>    expansion of f
+  !! calculate scattering amplitude unscaled
+  f(:) = 0d0
   do ntheta = 1, nthetamax
     costheta = cos(theta(ntheta) * (pi/180d0))
 
-    f(ntheta) = 0d0
     do l = lmin, lmax
-      f(ntheta) = f(ntheta) + ((2d0*l + 1d0)*Ton(l)*PL(l, costheta))
+      f(ntheta) = f(ntheta) + (2d0*l + 1d0)*Ton(l)*PL(l, costheta)
     end do
-    f(ntheta) = f(ntheta) * (-pi/(k ** 2))
 
   end do
+  !! scale scattering amplitude
+  f(:) = f(:) * (-pi/(k ** 2))
 
 !>>> obtain the DCS from the scattering amplitude
   do ntheta = 1, nthetamax
@@ -335,9 +355,6 @@ subroutine setup_contwaves(nkmax, kgrid, l, nrmax, rgrid, contwaves)
   fact_term = 1
   do ii = 1, (2*l + 1), 2
     fact_term = fact_term * ii
-
-    !! debug
-    write (*, *) "[debug] <ii> = ", ii, "<fact_term> = ", fact_term
   end do
 
   !! iterate over k
@@ -535,8 +552,13 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
   Kon = Vmat(1,1) + sum(kweights(2:nkmax)*Vmat(1, 2:nkmax)*Koff(:))
 
 !>>> And then use Kon to get the on-shell T-matrix element Ton
-  Ton = Kon / (1d0 + ((0d0,1d0)*pi*Kon)/kweights(1))
+  Ton = Kon / (1d0 + ((0d0,1d0)*pi*Kon)/kgrid(1))
 
+  ! !! debug:
+  ! write (*, *) "[debug] <Von> = ", Von
+  ! write (*, *) "[debug] <Kon> = ", Kon
+  ! write (*, *) "[debug] <Ton> = ", Ton
+  ! !! debug: end
 end subroutine tmatrix_solver
 
 !A subroutine provided for you to set up the kgrid and kweights

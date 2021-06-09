@@ -163,7 +163,7 @@ C
       PLM = 0.0D0
 C
 C ***  CHECK THAT PARAMETERS ARE O.K.
-C 
+C
         IF((ABS(X).GT.1D0).OR.(L.LT.0)) THEN
         WRITE(6,1000)X,L
         STOP
@@ -192,9 +192,9 @@ C
 C
       if (m.eq.0) then
          omx = 1.0
-      else 
+      else
          OMX = DSQRT(1.0D0-X*X)**M
-      endif 
+      endif
       A = OMX*DF1(M+1)
         IF(L.LE.M+1) THEN
         PLM = A
@@ -282,10 +282,10 @@ C
       DF1(1) = 1.0D0
       DF2(1) = 1.0D0
 C This patch remains until we have completed
-C transferring all programmes onto the Encore.      
+C transferring all programmes onto the Encore.
 Ctemporary-uncomment when everything works    DO 100 I = 2,lmax
 C This routine crashes without this patch
-C if lmax > 147.      
+C if lmax > 147.
       DO 100 I = 2,min(140,100)
 c$$$      DO 100 I = 2,100
       DF1(I) = DBLE(2*I-3)*DF1(I-1)
@@ -436,9 +436,9 @@ C
 8     DF=DF*DLL
       if (m.eq.0) then
          omx = 1.0
-      else 
+      else
          OMX=DSQRT(1.D0-X*X)**M
-      endif 
+      endif
       A=OMX*DF
       IF(L.NE.M) GO TO 9
       XPLM=A
