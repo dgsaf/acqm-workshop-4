@@ -1,0 +1,130 @@
+% - base
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{base}[2016/11/09 v1.0 Standard LaTeX package]
+
+% - packages
+\RequirePackage[l2tabu, orthodox]{nag}
+
+% -- language and text
+\RequirePackage[english]{babel}
+\RequirePackage[utf8x]{inputenc}
+\RequirePackage{microtype}
+
+% -- latex
+\RequirePackage{xifthen}
+\RequirePackage{etoolbox}
+
+% -- mathematics
+\RequirePackage{amsmath, amssymb, amsfonts, mathtools}
+
+% -- physics
+\RequirePackage{physics}
+\RequirePackage{siunitx}
+\RequirePackage{tensor}
+
+% -- layout
+\RequirePackage{geometry}
+
+% -- figures
+\RequirePackage[font={small, it}]{caption}
+\RequirePackage{subcaption}
+
+% -- graphics
+\RequirePackage{graphicx}
+\RequirePackage{pgfplots, tikz, pgfplotstable}
+\pgfplotsset{compat = 1.13}
+\usepgfplotslibrary{fillbetween, units}
+
+% -- title
+\RequirePackage{titling}
+
+% -- tables
+\RequirePackage{booktabs}
+
+% -- header
+\RequirePackage{fancyhdr}
+
+% -- linking
+\RequirePackage{hyperref}
+\hypersetup{
+    linktocpage
+    , colorlinks=true
+    , linkcolor=blue
+    , final
+}
+
+% -- tools
+\RequirePackage[marginpar]{todo}
+\RequirePackage{framed}
+
+% -- environments
+\RequirePackage[shortlabels]{enumitem}
+\RequirePackage{verbatim}
+
+% -- listings
+\RequirePackage{color}
+\RequirePackage{listings}
+\lstset{
+  basicstyle = \ttfamily\footnotesize\color{black}
+  , commentstyle = \color{blue}
+  , keywordstyle = \color{purple}
+  , stringstyle = \color{orange}
+  %
+  , numbers = left
+  , numbersep = 5pt
+  , stepnumber = 1
+  , numberstyle = \ttfamily\small\color{black}
+  %
+  , keepspaces = true
+  , showspaces = false
+  , showstringspaces = false
+  , showtabs = false
+  , tabsize = 2
+  , breaklines = true
+  %
+  , frame = single
+  , backgroundcolor = \color{white}
+  , rulecolor = \color{black}
+  , captionpos = b
+  %
+  % , language =
+}
+
+% - macros
+
+% -- macros [mathematics]
+
+% --- delimiters
+\DeclarePairedDelimiter{\lr}{(}{)}
+\DeclarePairedDelimiter{\lrsq}{[}{]}
+\DeclarePairedDelimiter{\lrset}{\lbrace}{\rbrace}
+\DeclarePairedDelimiter{\lrang}{\langle}{\rangle}
+\DeclarePairedDelimiter{\lrabs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\lrnorm}{\lVert}{\rVert}
+
+% --- sets
+\renewcommand{\natural}{\mathbb{N}}
+\newcommand{\integer}{\mathbb{Z}}
+\newcommand{\rational}{\mathbb{Q}}
+\renewcommand{\real}{\mathbb{R}}
+\newcommand{\complex}{\mathbb{C}}
+
+% --- miscellaneous
+\renewcommand{\imath}{\mathrm{i}}
+\renewcommand{\exp}[1]{e^{#1}}
+
+% -- macros [listings]
+
+% --- file / folder
+\lstdefinestyle{ff}{
+  basicstyle = \ttfamily\normalsize\color{purple}
+}
+\newcommand{\lilf}[1]{\lstinline[style = ff]{#1}}
+
+% - settings
+
+% -- bibliography and referencing
+\bibliographystyle{apalike}
+
+% -- paragraphs
+\setlength{\parindent}{0 pt}
