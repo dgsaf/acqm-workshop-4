@@ -473,13 +473,28 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
       Von,           & !on-shell V-matrix element
       A(nkmax-1,nkmax-1) !Coefficient matrix for the linear system Ax=b
   integer :: j, ipiv(nkmax-1), info
+  !! local variables
+  integer :: ff, nn ! loop variables
 
 !>>> store the on-shell V-matrix element in Von
+  Von = Vmat(1, 1)
 
 !>>> populate the matrix A according to Eq (113) in the slides
+  !! iterate through A matrix
+  do nn = 1, nkmax-1
+    !! set all elements (neglecting delta_{i, j} terms)
+    do ff = 1, nkmax-1
+      A(ff, nn) = - kweights(nn+1)*Vmat(ff+1, nn+1)
+    end do
+    !! add diagonal delta{i, i} terms
+    A(nn, nn) = A(nn, nn) + 1d0
+  end do
 
 !>>> populate the vector Koff with the half-on-shell V-matrix elements (RHS of
 !>>> Eq (112))
+  do nn = 1, nkmax-1
+    Koff(nn) = Vmat(nn+1, 1)
+  end do
 
   !Here is the call to DGESV
   call dgesv( nkmax-1, 1, A, nkmax-1, ipiv, Koff, nkmax-1, info )
@@ -489,8 +504,10 @@ subroutine tmatrix_solver(nkmax,kgrid,kweights,Vmat,Ton)
 
 !>>> Now use the half-on-shell K matrix which has been stored in Koff to get the
 !>>> on-shell K-matrix element Kon
+  Kon = Vmat(1,1) + sum(kweights(2:nkmax)*Vmat(1, 2:nkmax)*Koff(:))
 
 !>>> And then use Kon to get the on-shell T-matrix element Ton
+  Ton = Kon / (1d0 + ((0d0,1d0)*pi*Kon)/kweights(1))
 
 end subroutine tmatrix_solver
 
