@@ -214,7 +214,7 @@ program main
   end if
 
   !! write dcs to file
-  write (iounit, *) "# theta, dcs(theta)"
+  ! write (iounit, *) "# theta, dcs(theta)"
   do ntheta = 1, nthetamax
     write (iounit, *) theta(ntheta), DCS(ntheta)
   end do
@@ -234,7 +234,7 @@ program main
   end if
 
   !! write ics to file
-  write (iounit, *) "# l, ics(l), sum(ics(1:l))"
+  ! write (iounit, *) "# l, ics(l), sum(ics(1:l))"
   do l = lmin, lmax
     write (iounit, *) l, ics(l), sum(ics(lmin:l))
   end do

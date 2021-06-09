@@ -81,34 +81,37 @@ for zproj in ${zproj_set} ; do
     cons_input ${zproj} ${lmax} ${energy}
 
     # execute job
-    # bin/main
+    t_start=$(date +%s)
+    bin/main > /dev/null
+    t_end=$(date +%s)
+    printf "time = %is\n" $((t_end - t_start))
 
     # relocate ics, dcs output files
-    # store_output ${zproj} ${lmax} ${energy}
+    store_output ${zproj} ${lmax} ${energy}
 
   done
 done
 
-# lmax job (for electron)
-echo "lmax jobs"
+# # lmax job (for electron)
+# echo "lmax jobs"
 
-# set zproj to -1
-zproj="-1"
+# # set zproj to -1
+# zproj="-1"
 
-# set energy to 25.0 eV
-energy="25.0"
+# # set energy to 25.0 eV
+# energy="25.0"
 
-for lmax in ${lmax_set} ; do
+# for lmax in ${lmax_set} ; do
 
-  # announce job
-  echo "lmax = ${lmax} "
+#   # announce job
+#   echo "lmax = ${lmax} "
 
-  # construct input file
-  # cons_input ${zproj} ${lmax} ${energy}
+#   # construct input file
+#   cons_input ${zproj} ${lmax} ${energy}
 
-  # execute job
-  # bin/main
+#   # execute job
+#   bin/main > /dev/null
 
-  # relocate ics, dcs output files
-  # store_output ${zproj} ${lmax} ${energy}
-done
+#   # relocate ics, dcs output files
+#   store_output ${zproj} ${lmax} ${energy}
+# done
