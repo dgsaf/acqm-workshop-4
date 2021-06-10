@@ -32,15 +32,17 @@ set grid xtics ytics
 set key \
   top right \
   box opaque \
-  samplen 1 spacing 0.6 width -4 height +0.5
+  samplen 1 spacing 0.6 height +0.6
 
 
 # figure: ics for each zproj
 do for [i=1:n_z] {
-   l = 5
    z = z(i)
+   l = 5
 
    set output sprintf("figure_ics_z-%+i_l-%i.tex", z, l)
+
+   set key width -3.75
 
    set title sprintf("Total and Partial ICS Curves [$z_{\\rm{proj}} = %i$]", z)
    set xlabel "Energy [eV]"
@@ -59,6 +61,34 @@ do for [i=1:n_z] {
        ics(z,l) using 1:j \
        title sprintf("$\\scriptscriptstyle\\ell = %i$", j-3) \
        with lines palette frac ((j-3)/(1.0*(l+1)))
+
+   set output
+}
+
+
+# figure: dcs for variety of energies
+do for [i=1:n_z] {
+   z = z(i)
+   l = 5
+
+   set key outside top right width -7
+
+   set output sprintf("figure_dcs_z-%+i_l-%i.tex", z, l)
+
+   set title "DCS Curves"
+   set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
+   set ylabel "DCS [$\\rm{a}_{0}^{2}.\\rm{sr}^{-1}$]"
+
+   set xrange [0:180]
+   set yrange [*:*]
+   set logscale y
+   set format y "%g"
+
+   plot \
+     for [j=1:n_en] \
+       dcs(z,l, en(j)) using 1:2 \
+       title sprintf("$\\scriptscriptstyle %.1f\\phantom{.}\\rm{eV}$", en(j)) \
+       with lines palette frac ((j - 1.0)/(n_en - 1.0))
 
    set output
 }
