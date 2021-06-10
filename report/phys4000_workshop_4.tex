@@ -3,6 +3,7 @@
 % - style template
 \usepackage{base}
 \usepackage{siunitx}
+\geometry{a4paper, margin = 0.75in}
 
 % - title, author, etc.
 \title{PHYS4000 - Workshop 4}
@@ -33,8 +34,46 @@
 \section{Potential Scattering}
 \label{sec:potential-scattering}
 
+Scattering calculations have been performed for a projectile, with charge
+$z_{\rm{proj}}$, scattering off a structure-less potential (equivalently - a
+one-state target) of the form
+\begin{equation}
+  \label{eq:potential}
+  V\lr{r}
+  =
+  z_{\rm{proj}}
+  \lr[\bigg]
+  {
+    1
+    +
+    \dfrac{1}{r}
+  }
+  \exp{- 2 r}
+  .
+\end{equation}
+In these scattering calculations, the following parameters were constant:
+$r_{\rm{max}} = 200$, $\rm{dr} = 0.001$ and $\ell_{\rm{min}} = 0$.
+Two sets of calculations were performed:
+\begin{enumerate}
+\item
+  With $\ell_{\rm{\max}} = 5$; for $z_{\rm{proj}} \in \lrset{-1, +1}$,
+  for $E_{\rm{proj}} \in \lrset{E_{k} = \alpha + \beta k^{2}}_{k = 1}^{20}$
+  with $\alpha, \beta$ such that $E_{1} = \SI{0.1}{\eV}$ and
+  $E_{20} = \SI{50.0}{\eV}$, the calculation was performed, and the ICS and DCS
+  curves extracted.
+
+\item
+  With $z_{\rm{proj}} = -1$, and $E_{\rm{proj}} = \SI{25.0}{\eV}$; for
+  $\ell \in \lrset{0, \dotsc, 9}$, the calculation was performed, and the ICS
+  and DCS curves extracted.
+\end{enumerate}
+
 \subsection{ICS Curves}
 \label{sec:ics-curves}
+
+The total and partial Integrated-Cross-Section (ICS) curves, extracted from the
+first set of calculations, are shown for an electron and positron projectile in
+\autoref{fig:ele-ics-curves} and \autoref{fig:pos-ics-curves} respectively.
 
 \begin{figure}[h]
   \begin{center}
@@ -42,9 +81,10 @@
   \end{center}
   \caption[Electron ICS Curves]{
     The total ICS curve (shown in black) and the partial ICS curves (shown in
-    blue-to-red) are presented, across projectile energies \SIrange{0}{50}{eV},
-    for an electron projectile.
-    Note that $l_{\rm{max}} = 5$.
+    blue-to-red) are presented, across projectile energies
+    \SIrange{0.1}{50}{eV}, for an electron projectile, with
+    $\ell_{\rm{min}} = 0$ and $\ell_{\rm{max}} = 5$.
+    Note that the $y$-axis is presented in log-scale.
   }
   \label{fig:ele-ics-curves}
 \end{figure}
@@ -55,9 +95,10 @@
   \end{center}
   \caption[Positron ICS Curves]{
     The total ICS curve (shown in black) and the partial ICS curves (shown in
-    blue-to-red) are presented, across projectile energies \SIrange{0}{50}{\eV},
-    for a positron projectile.
-    Note that $l_{\rm{max}} = 5$.
+    blue-to-red) are presented, across projectile energies
+    \SIrange{0.1}{50}{\eV}, for a positron projectile, with
+    $\ell_{\rm{min}} = 0$ and $\ell_{\rm{max}} = 5$.
+    Note that the $y$-axis is presented in log-scale.
   }
   \label{fig:pos-ics-curves}
 \end{figure}
@@ -67,13 +108,20 @@
 \subsection{DCS Curves}
 \label{sec:dcs-curves}
 
+The Differential-Cross-Section (DCS) curves, extracted from the first set
+of calculations, are shown for an electron and positron projectile in
+\autoref{fig:ele-dcs-curves} and \autoref{fig:pos-dcs-curves} respectively.
+
 \begin{figure}[h]
   \begin{center}
     \input{figure_dcs_z--1_l-5.tex}
   \end{center}
   \caption[Electron DCS Curves]{
     The DCS curves (shown in blue-to-red) are presented, across scattering
-    angles \SIrange{0}{180}{\degree}
+    angles \SIrange{0}{180}{\degree}, for an electron projectile, with
+    projectile energies ranging across \SIrange{0.1}{50}{\eV}, and with
+    $\ell_{\rm{min}} = 0$ and $\ell_{\rm{max}} = 5$.
+    Note that the $y$-axis is presented in log-scale.
   }
   \label{fig:ele-dcs-curves}
 \end{figure}
@@ -83,6 +131,11 @@
     \input{figure_dcs_z-+1_l-5.tex}
   \end{center}
   \caption[Positron DCS Curves]{
+    The DCS curves (shown in blue-to-red) are presented, across scattering
+    angles \SIrange{0}{180}{\degree}, for a positron projectile, with
+    projectile energies ranging across \SIrange{0.1}{50}{\eV}, and with
+    $\ell_{\rm{min}} = 0$ and $\ell_{\rm{max}} = 5$.
+    Note that the $y$-axis is presented in log-scale.
   }
   \label{fig:pos-dcs-curves}
 \end{figure}
@@ -92,14 +145,80 @@
 \subsection{DCS Curve Convergence}
 \label{sec:dcs-curve-conv}
 
+The Differential-Cross-Section (DCS) curves, extracted from the second set
+of calculations, are shown in \autoref{fig:convergence-dcs-curves}.
+
 \begin{figure}[h]
   \begin{center}
     \input{figure_dcs_convergence.tex}
   \end{center}
   \caption[Convergence of DCS Curves]{
+    The DCS curves (shown in blue-to-red) are presented, across scattering
+    angles \SIrange{0}{180}{\degree}, for an electron projectile, with
+    projectile energy $E = \SI{25.0}{\eV}$, and $\ell_{\rm{min}} = 0$, with
+    $\ell_{\rm{max}}$ ranging across \SIrange{0}{9}{}.
+    Note that the $y$-axis is presented in log-scale.
   }
   \label{fig:convergence-dcs-curves}
 \end{figure}
+
+It can be seen that the DCS converges rather quickly for this projectile
+energy of \SI{25.0}{\eV}.
+A point of interest is that the DCS curve, for $\ell_{\rm{max}} = 0$, is
+constant.
+This is a consequence of the behaviour of the zeroth-order Legendre polynomials
+$P_{\ell}\lr{\cos\theta}$, for which $P_{0}\lr{\cos\theta} = 1$.
+To see this, note that the differential cross section, for this scattering
+calculation, is of the form
+\begin{equation*}
+  \dv{\sigma}{\Omega}
+  \lr{\theta}
+  =
+  \abs
+  {
+    f\lr{\vb{k}_{f}, \vb{k}_{i}}
+  }^{2}
+\end{equation*}
+where $\vb{k}_{f}$ is such that $k_{f} = k_{i}$, and where
+$\cos\theta = \hat{\vb{k}}_{f}\cdot\hat{\vb{k}}_{i}$, with the scattering
+amplitude being of the form
+\begin{equation*}
+  f\lr{\vb{k}_{f}, \vb{k}_{i}}
+  =
+  -
+  \dfrac{\pi}{k_{i}^{2}}
+  \sum_{\ell = \ell_{\rm{min}}}^{\ell_{\rm{max}}}
+  \lr{2\ell + 1}
+  T_{\ell}\lr{k_{i}, k_{i}}
+  P_{\ell}\lr{\cos\theta}
+  .
+\end{equation*}
+Hence, where $\ell_{\rm{min}} = \ell_{\rm{max}} = 0$, we have that
+\begin{equation*}
+  f\lr{\vb{k}_{f}, \vb{k}_{i}}
+  =
+  -
+  \dfrac{\pi}{k_{i}^{2}}
+  \sum_{\ell = 0}^{0}
+  T_{0}\lr{k_{i}, k_{i}}
+  P_{0}\lr{\cos\theta}
+  =
+  -
+  \dfrac{\pi}{k_{i}^{2}}
+  T_{0}\lr{k_{i}, k_{i}}
+\end{equation*}
+whence
+\begin{equation*}
+  \dv{\sigma}{\Omega}
+  \lr{\theta}
+  =
+  \dfrac{\pi^{2}}{k_{i}^{4}}
+  \abs
+  {
+    T_{0}\lr{k_{i}, k_{i}}
+  }^{2}
+\end{equation*}
+demonstrating the constant behaviour of the DCS curve for $\ell_{\rm{max}} = 0$.
 
 \clearpage
 
