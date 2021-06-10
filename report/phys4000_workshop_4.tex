@@ -2,6 +2,7 @@
 
 % - style template
 \usepackage{base}
+\usepackage{siunitx}
 
 % - title, author, etc.
 \title{PHYS4000 - Workshop 4}
@@ -40,6 +41,10 @@
     \input{figure_ics_z--1_l-5.tex}
   \end{center}
   \caption[Electron ICS Curves]{
+    The total ICS curve (shown in black) and the partial ICS curves (shown in
+    blue-to-red) are presented, across projectile energies \SIrange{0}{50}{eV},
+    for an electron projectile.
+    Note that $l_{\rm{max}} = 5$.
   }
   \label{fig:ele-ics-curves}
 \end{figure}
@@ -49,9 +54,15 @@
     \input{figure_ics_z-+1_l-5.tex}
   \end{center}
   \caption[Positron ICS Curves]{
+    The total ICS curve (shown in black) and the partial ICS curves (shown in
+    blue-to-red) are presented, across projectile energies \SIrange{0}{50}{\eV},
+    for a positron projectile.
+    Note that $l_{\rm{max}} = 5$.
   }
   \label{fig:pos-ics-curves}
 \end{figure}
+
+\clearpage
 
 \subsection{DCS Curves}
 \label{sec:dcs-curves}
@@ -61,6 +72,8 @@
     \input{figure_dcs_z--1_l-5.tex}
   \end{center}
   \caption[Electron DCS Curves]{
+    The DCS curves (shown in blue-to-red) are presented, across scattering
+    angles \SIrange{0}{180}{\degree}
   }
   \label{fig:ele-dcs-curves}
 \end{figure}
@@ -73,6 +86,8 @@
   }
   \label{fig:pos-dcs-curves}
 \end{figure}
+
+\clearpage
 
 \subsection{DCS Curve Convergence}
 \label{sec:dcs-curve-conv}

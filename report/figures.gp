@@ -45,8 +45,8 @@ do for [i=1:n_z] {
    set key width -3.75
 
    set title sprintf("Total and Partial ICS Curves [$z_{\\rm{proj}} = %i$]", z)
-   set xlabel "Energy [eV]"
-   set ylabel "ICS [$\\rm{a}_{0}^{2}$]"
+   set xlabel "Energy [\\si{\\eV}]"
+   set ylabel "ICS [\\si{\\bohr^{2}}]"
 
    set xrange [0:50]
    set yrange [0.00001:*]
@@ -76,9 +76,8 @@ do for [i=1:n_z] {
    set output sprintf("figure_dcs_z-%+i_l-%i.tex", z, l)
 
    set title sprintf("DCS Curves [$z_{\\rm{proj}} = %i$]", z)
-   # set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
-   set xlabel "$\\theta$ [deg]"
-   set ylabel "DCS [$\\rm{a}_{0}^{2}\\phantom{.}\\rm{sr}^{-1}$]"
+   set xlabel "$\\theta$ [\\si{\\degree}]"
+   set ylabel "DCS [\\si{\\bohr^{2}.\\steradian^{-1}}]"
 
    set xrange [0:180]
    set yrange [*:*]
@@ -104,10 +103,10 @@ do for [i=1:n_z] {
 
    set output sprintf("figure_dcs_convergence.tex")
 
-   set title "Convergence of DCS Curves [$z_{\\rm{proj}} = -1$, E = 25.0 eV]"
-   # set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
-   set xlabel "$\\theta$ [deg]"
-   set ylabel "DCS [$\\rm{a}_{0}^{2}\\phantom{.}\\rm{sr}^{-1}$]"
+   set title \
+     "Convergence of DCS Curves [$z_{\\rm{proj}} = -1$, E = \\SI{25.0}{\\eV}]"
+   set xlabel "$\\theta$ [\\si{\\degree}]"
+   set ylabel "DCS [\\si{\\bohr^{2}.\\steradian^{-1}}]"
 
    set xrange [0:180]
    set yrange [*:1.2]
