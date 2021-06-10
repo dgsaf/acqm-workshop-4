@@ -225,7 +225,381 @@ demonstrating the constant behaviour of the DCS curve for $\ell_{\rm{max}} = 0$.
 \section{Derivation}
 \label{sec:derivation}
 
+The 3D Lippmann-Schwinger equation is of the form
+\begin{equation}
+  \label{eq:lippmann-schwinger-3d}
+  \mel{\boldsymbol{k}_{f}}{T}{\boldsymbol{k}_{i}}
+  =
+  \mel{\boldsymbol{k}_{f}}{V}{\boldsymbol{k}_{i}}
+  +
+  \int
+  \dd{\boldsymbol{k}}
+  \dfrac
+  {
+    \mel{\boldsymbol{k}_{f}}{V}{\boldsymbol{k}}
+    \mel{\boldsymbol{k}}{T}{\boldsymbol{k}_{i}}
+  }
+  {
+    E
+    +
+    \imath 0
+    -
+    \tfrac{1}{2}
+    k^{2}
+  }
+  .
+\end{equation}
+We note that the partial-wave expansion of the T-matrix is of the form
+\begin{equation}
+  \label{eq:partial-wave-t}
+  \mel{\boldsymbol{k}_{f}}{T}{\boldsymbol{k}_{i}}
+  =
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  T_{\ell}\lr{k_{f}, k_{i}}
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+\end{equation}
+and similarily so for the partial-wave expansion of the V-matrix,
+\begin{equation}
+  \label{eq:partial-wave-v}
+  \mel{\boldsymbol{k}_{f}}{V}{\boldsymbol{k}_{i}}
+  =
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  V_{\ell}\lr{k_{f}, k_{i}}
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+  .
+\end{equation}
+Replacing the left hand side of \autoref{eq:lippmann-schwinger-3d} with the
+partial-wave expansion of the T-matrix, we have that
+\begin{equation*}
+  \mathrm{LHS}
+  =
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  T_{\ell}\lr{k_{f}, k_{i}}
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+\end{equation*}
+while substituting in the partial-wave expansions into the right hand side of
+\autoref{eq:lippmann-schwinger-3d}, we have that
+\begin{alignat*}{2}
+  \mathrm{RHS}
+  {}={}
+  &
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  V_{\ell}\lr{k_{f}, k_{i}}
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+  \\
+  {}+{}
+  &
+  \int
+  \dd{\boldsymbol{k}}
+  \dfrac
+  {
+    1
+  }
+  {
+    E
+    +
+    \imath 0
+    -
+    \tfrac{1}{2}
+    k^{2}
+  }
+  \lr[\bigg]
+  {
+    \dfrac{1}{k_{f} k}
+    \sum_{\ell, m}
+    V_{\ell}\lr{k_{f}, k}
+    Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+    Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}}
+  }
+  \lr[\bigg]
+  {
+    \dfrac{1}{k k_{i}}
+    \sum_{\ell', m'}
+    T_{\ell'}\lr{k, k_{i}}
+    Y_{\ell' m'}\lr{\hat{\boldsymbol{k}}}
+    Y_{\ell' m'}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+  }
+  \\
+  {}={}
+  &
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  V_{\ell}\lr{k_{f}, k_{i}}
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+  \\
+  {}+{}
+  &
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  \sum_{\ell', m'}
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell' m'}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+  \int
+  \dd{\boldsymbol{k}}
+  \dfrac{1}{k^{2}}
+  \dfrac
+  {
+    V_{\ell}\lr{k_{f}, k}
+    T_{\ell'}\lr{k, k_{i}}
+    Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}}
+    Y_{\ell' m'}\lr{\hat{\boldsymbol{k}}}
+  }
+  {
+    E
+    +
+    \imath 0
+    -
+    \tfrac{1}{2}
+    k^{2}
+  }
+  \\
+  {}={}
+  &
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  \lr[\Bigg]
+  {
+    V_{\ell}\lr{k_{f}, k_{i}}
+    Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+    Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+    \\
+    {}+{}
+    &
+    \phantom
+    {
+      \dfrac{1}{k_{f} k_{i}}
+      \sum_{\ell, m}
+    }
+    \sum_{\ell', m'}
+    Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+    Y_{\ell' m'}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+    \int
+    \dd{k}
+    \dfrac
+    {
+      V_{\ell}\lr{k_{f}, k}
+      T_{\ell'}\lr{k, k_{i}}
+    }
+    {
+      E
+      +
+      \imath 0
+      -
+      \tfrac{1}{2}
+      k^{2}
+    }
+    \int
+    \dd{\hat{\boldsymbol{k}}}
+    Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}}
+    Y_{\ell' m'}\lr{\hat{\boldsymbol{k}}}
+  }
+  \\
+  {}={}
+  &
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  \lr[\Bigg]
+  {
+    V_{\ell}\lr{k_{f}, k_{i}}
+    +
+    \int
+    \dd{k}
+    \dfrac
+    {
+      V_{\ell}\lr{k_{f}, k}
+      T_{\ell}\lr{k, k_{i}}
+    }
+    {
+      E
+      +
+      \imath 0
+      -
+      \tfrac{1}{2}
+      k^{2}
+    }
+  }
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+\end{alignat*}
+where other than simple algebraic re-arrangment, we have utilised the
+orthogonality of the spherical harmonics to reduce the sum over $\ell', m'$.
+It then follows, on subtracting one side from the other, that
+\begin{equation*}
+  \mathrm{LHS}
+  -
+  \mathrm{RHS}
+  =
+  \dfrac{1}{k_{f} k_{i}}
+  \sum_{\ell, m}
+  \lr[\Bigg]
+  {
+    T_{\ell}\lr{k_{f}, k_{i}}
+    -
+    V_{\ell}\lr{k_{f}, k_{i}}
+    +
+    \int
+    \dd{k}
+    \dfrac
+    {
+      V_{\ell}\lr{k_{f}, k}
+      T_{\ell}\lr{k, k_{i}}
+    }
+    {
+      E
+      +
+      \imath 0
+      -
+      \tfrac{1}{2}
+      k^{2}
+    }
+  }
+  Y_{\ell m}\lr{\hat{\boldsymbol{k}}_{f}}
+  Y_{\ell m}^{*}\lr{\hat{\boldsymbol{k}}_{i}}
+\end{equation*}
+which is zero if and only if the term inside the sum is zero for all $\ell, m$;
+that is to say, that we must have
+\begin{equation}
+  \label{eq:lippmann-schwinger-partial-wave}
+  T_{\ell}\lr{k_{f}, k_{i}}
+  =
+  V_{\ell}\lr{k_{f}, k_{i}}
+  +
+  \int
+  \dd{k}
+  \dfrac
+  {
+    V_{\ell}\lr{k_{f}, k}
+    T_{\ell}\lr{k, k_{i}}
+  }
+  {
+    E
+    +
+    \imath 0
+    -
+    \tfrac{1}{2}
+    k^{2}
+  }
+\end{equation}
+whence we have the partial-wave Lippmann-Schwinger equation.
+
 \section{Dimensional Analysis}
 \label{sec:dimensional-analysis}
+
+We note that the partial-wave T-matrix elements are linearly added with the
+partial-wave V-matrix elements in \autoref{eq:lippmann-schwinger-partial-wave},
+and so they must have the same units; that is,
+$\lrsq{T_{\ell}\lr{k_{f}, k_{i}}} = \lrsq{V_{\ell}\lr{k_{f}, k_{i}}}$.
+We note also that we are working in units where $\lrsq{E} = \lrsq{k^{2}}$, with
+$\lrsq{k} = L^{-1}$.
+In dimensional terms, the partial-wave Lippmann-Schwinger equation is of the
+form
+\begin{equation*}
+  \lrsq{T_{\ell}\lr{k_{f}, k_{i}}}
+  -
+  \lrsq{V_{\ell}\lr{k_{f}, k_{i}}}
+  =
+  \lrsq[\bigg]
+  {
+    \int
+    \dd{k}
+    \dfrac
+    {
+      V_{\ell}\lr{k_{f}, k}
+      T_{\ell}\lr{k, k_{i}}
+    }
+    {
+      E
+      -
+      \tfrac{1}{2}
+      k^{2}
+    }
+  }
+  =
+  \lrsq{V_{\ell}\lr{k_{f}, k}}
+  \lrsq{T_{\ell}\lr{k, k_{i}}}
+  \lrsq[\bigg]
+  {
+    \int
+    \dd{k}
+    \dfrac
+    {
+      1
+    }
+    {
+      E
+      -
+      \tfrac{1}{2}
+      k^{2}
+    }
+  }
+\end{equation*}
+where we note that
+\begin{equation*}
+  \lrsq[\bigg]
+  {
+    \int
+    \dd{k}
+    \dfrac
+    {
+      1
+    }
+    {
+      E
+      -
+      \tfrac{1}{2}
+      k^{2}
+    }
+  }
+  =
+  L^{2}
+  \lrsq[\bigg]
+  {
+    \int
+    \dd{k}
+  }
+  =
+  L
+  .
+\end{equation*}
+It therefore follows that the units of the partial-wave T-matrix elements must
+satisfy
+\begin{equation*}
+  \lrsq{T_{\ell}\lr{k_{f}, k_{i}}}
+  =
+  \lrsq{T_{\ell}\lr{k, k_{i}}}^{2}
+  L
+\end{equation*}
+whence we have that $\lrsq{T_{\ell}\lr{k_{f}, k_{i}}} = L^{-1}$.
+To verify this, note that the partial-wave cross sections, $\sigma_{\ell}$, have
+units $\lrsq{\sigma_{\ell}} = L^{2}$, and are defined by the expression
+\begin{equation*}
+  \sigma_{\ell}
+  =
+  \dfrac{4 \pi^{3}}{k_{i}^{4}}
+  \lr{2 \ell + 1}
+  \lrabs{T_{\ell}\lr{k_{f}, k_{i}}}^{2}
+\end{equation*}
+which, written in dimensional terms, is of the form
+\begin{equation*}
+  \lrsq{\sigma_{\ell}}
+  =
+  \dfrac{1}{\lrsq{k_{i}}^{4}}
+  \lrsq{T_{\ell}\lr{k_{f}, k_{i}}}^{2}
+  =
+  L^{4}
+  L^{-2}
+  =
+  L^{2}
+\end{equation*}
+yielding the appropriate units as required.
 
 \end{document}
