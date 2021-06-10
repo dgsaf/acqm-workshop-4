@@ -1,5 +1,5 @@
 #
-# set terminal epslatex input color solid
+set terminal epslatex input color solid
 
 
 # files
@@ -26,10 +26,13 @@ en(k) = eni + ((k**2) - 1)*((enf - eni)/((n_en**2) - 1))
 
 
 # common settings
-set key inside right top box
-set grid xtics ytics
 set palette defined (0 "blue" , 1 "red")
 unset colorbox
+set grid xtics ytics
+set key \
+  top right \
+  box opaque \
+  samplen 1 spacing 0.6 width -4 height +0.5
 
 
 # figure: ics for each zproj
@@ -39,18 +42,23 @@ do for [i=1:n_z] {
 
    set output sprintf("figure_ics_z-%+i_l-%i.tex", z, l)
 
-   set title sprintf("Partial ICS [$z_{\rm{proj}} = %i$]", z)
+   set title sprintf("Total and Partial ICS Curves [$z_{\\rm{proj}} = %i$]", z)
    set xlabel "Energy [eV]"
-   set ylabel "ICS [$a_{0}^{2}$]"
+   set ylabel "ICS [$\\rm{a}_{0}^{2}$]"
 
    set xrange [0:50]
    set yrange [0.00001:*]
    set logscale y
+   set format y "$10^{%L}$"
 
-   plot for [j=3:3+l] \
-        ics(z,l) using 1:j title sprintf("$l = %i$", j-3) \
-        with lines palette frac ((j-3)/(1.0*(l+1)))
+   plot \
+     ics(z,l) using 1:2 \
+       title sprintf("$\\scriptscriptstyle\\sum_{\\ell}$", j-3) \
+       with lines lc "black", \
+     for [j=3:3+l] \
+       ics(z,l) using 1:j \
+       title sprintf("$\\scriptscriptstyle\\ell = %i$", j-3) \
+       with lines palette frac ((j-3)/(1.0*(l+1)))
 
-   pause -1
-
+   set output
 }
