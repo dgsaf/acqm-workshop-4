@@ -76,7 +76,8 @@ do for [i=1:n_z] {
    set output sprintf("figure_dcs_z-%+i_l-%i.tex", z, l)
 
    set title sprintf("DCS Curves [$z_{\\rm{proj}} = %i$]", z)
-   set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
+   # set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
+   set xlabel "$\\theta$ [deg]"
    set ylabel "DCS [$\\rm{a}_{0}^{2}\\phantom{.}\\rm{sr}^{-1}$]"
 
    set xrange [0:180]
@@ -104,11 +105,12 @@ do for [i=1:n_z] {
    set output sprintf("figure_dcs_convergence.tex")
 
    set title "Convergence of DCS Curves [$z_{\\rm{proj}} = -1$, E = 25.0 eV]"
-   set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
+   # set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
+   set xlabel "$\\theta$ [deg]"
    set ylabel "DCS [$\\rm{a}_{0}^{2}\\phantom{.}\\rm{sr}^{-1}$]"
 
    set xrange [0:180]
-   set yrange [*:2]
+   set yrange [*:1.2]
    set logscale y
    set format y "%g"
 
