@@ -75,9 +75,9 @@ do for [i=1:n_z] {
 
    set output sprintf("figure_dcs_z-%+i_l-%i.tex", z, l)
 
-   set title "DCS Curves"
+   set title sprintf("DCS Curves [$z_{\\rm{proj}} = %i$]", z)
    set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
-   set ylabel "DCS [$\\rm{a}_{0}^{2}.\\rm{sr}^{-1}$]"
+   set ylabel "DCS [$\\rm{a}_{0}^{2}\\phantom{.}\\rm{sr}^{-1}$]"
 
    set xrange [0:180]
    set yrange [*:*]
@@ -86,9 +86,37 @@ do for [i=1:n_z] {
 
    plot \
      for [j=1:n_en] \
-       dcs(z,l, en(j)) using 1:2 \
+       dcs(z,l,en(j)) using 1:2 \
        title sprintf("$\\scriptscriptstyle %.1f\\phantom{.}\\rm{eV}$", en(j)) \
        with lines palette frac ((j - 1.0)/(n_en - 1.0))
+
+   set output
+}
+
+
+# figure: dcs convergence
+{
+   z = -1
+   en = 25.0
+
+   set key inside top right width -2.75
+
+   set output sprintf("figure_dcs_convergence.tex")
+
+   set title "Convergence of DCS Curves [$z_{\\rm{proj}} = -1$, E = 25.0 eV]"
+   set xlabel "$\\theta$ [${\\phantom{.}}^{\\circ}$]"
+   set ylabel "DCS [$\\rm{a}_{0}^{2}\\phantom{.}\\rm{sr}^{-1}$]"
+
+   set xrange [0:180]
+   set yrange [*:2]
+   set logscale y
+   set format y "%g"
+
+   plot \
+     for [j=1:n_l] \
+       dcs(z,l(j),en) using 1:2 \
+       title sprintf("$\\scriptscriptstyle \\ell=%i$", l(j)) \
+       with lines palette frac ((j - 1.0)/(n_l - 1.0))
 
    set output
 }
